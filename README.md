@@ -2,6 +2,9 @@
 
 Generate beautiful, professional release notes for your projects using AI. This tool helps developers and teams automatically create meaningful release notes from their code changes.
 
+<img width="985" alt="image" src="https://github.com/user-attachments/assets/03f86b49-458c-4698-8a49-376aa37dd73c" />
+
+
 ## Features ✨
 
 - 🎯 AI-powered release notes generation
