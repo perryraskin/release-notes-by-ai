@@ -3,7 +3,12 @@ import { GithubUrlInput } from "@/components/GithubUrlInput";
 import { DateRangeSelector } from "@/components/DateRangeSelector";
 import { ReleaseNotes } from "@/components/ReleaseNotes";
 import { Button } from "@/components/ui/button";
-import { parseGithubUrl, fetchCommits } from "@/lib/github";
+import { Input } from "@/components/ui/input";
+import {
+  parseGithubUrl,
+  fetchCommits,
+  checkRepoVisibility,
+} from "@/lib/github";
 import { generateReleaseNotes } from "@/lib/openai";
 import { useToast } from "@/components/ui/use-toast";
 import { Card } from "@/components/ui/card";
@@ -15,11 +20,23 @@ const Index = () => {
   const [loading, setLoading] = useState(false);
   const [releaseNotes, setReleaseNotes] = useState<string>();
   const [urlError, setUrlError] = useState<string>();
+  const [githubToken, setGithubToken] = useState(
+    localStorage.getItem("GITHUB_TOKEN") || ""
+  );
   const { toast } = useToast();
+
+  const handleGithubTokenChange = (token: string) => {
+    setGithubToken(token);
+    if (token) {
+      localStorage.setItem("GITHUB_TOKEN", token);
+    } else {
+      localStorage.removeItem("GITHUB_TOKEN");
+    }
+  };
 
   const handleSubmit = async () => {
     setUrlError(undefined);
-    
+
     if (!startDate || !endDate) {
       toast({
         title: "Error",
@@ -35,7 +52,7 @@ const Index = () => {
       return;
     }
 
-    if (!localStorage.getItem('OPENAI_API_KEY')) {
+    if (!localStorage.getItem("OPENAI_API_KEY")) {
       toast({
         title: "Error",
         description: "Please enter your OpenAI API key in the settings",
@@ -46,13 +63,46 @@ const Index = () => {
 
     setLoading(true);
     try {
-      const commits = await fetchCommits(repoInfo.owner, repoInfo.repo, startDate, endDate);
-      const notes = await generateReleaseNotes(commits.map(c => c.message));
+      // Check repository visibility
+      const { isPrivate, error } = await checkRepoVisibility(
+        repoInfo.owner,
+        repoInfo.repo
+      );
+
+      if (error) {
+        toast({
+          title: "Error",
+          description: error,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (isPrivate && !githubToken) {
+        toast({
+          title: "Error",
+          description:
+            "This is a private repository. Please provide a GitHub access token.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const commits = await fetchCommits(
+        repoInfo.owner,
+        repoInfo.repo,
+        startDate,
+        endDate
+      );
+      const notes = await generateReleaseNotes(commits.map((c) => c.message));
       setReleaseNotes(notes);
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to generate release notes. Please try again.",
+        description:
+          error instanceof Error
+            ? error.message
+            : "Failed to generate release notes. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -73,24 +123,39 @@ const Index = () => {
         </div>
 
         <Card className="p-6 space-y-6">
-          <GithubUrlInput
-            value={url}
-            onChange={setUrl}
-            error={urlError}
-          />
-          
-          <DateRangeSelector
-            startDate={startDate}
-            endDate={endDate}
-            onStartDateChange={setStartDate}
-            onEndDateChange={setEndDate}
-          />
+          <div className="space-y-4">
+            <div>
+              <label
+                htmlFor="github-token"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >
+                GitHub Access Token (required for private repositories)
+              </label>
+              <Input
+                id="github-token"
+                type="password"
+                value={githubToken}
+                onChange={(e) => handleGithubTokenChange(e.target.value)}
+                placeholder="ghp_xxxxxxxxxxxxxxxxxxxx"
+                className="mt-1"
+              />
+              <p className="mt-1 text-sm text-gray-500">
+                Your token will be stored locally and only used to access GitHub
+                repositories
+              </p>
+            </div>
 
-          <Button
-            className="w-full"
-            onClick={handleSubmit}
-            disabled={loading}
-          >
+            <GithubUrlInput value={url} onChange={setUrl} error={urlError} />
+
+            <DateRangeSelector
+              startDate={startDate}
+              endDate={endDate}
+              onStartDateChange={setStartDate}
+              onEndDateChange={setEndDate}
+            />
+          </div>
+
+          <Button className="w-full" onClick={handleSubmit} disabled={loading}>
             {loading ? "Generating..." : "Generate Release Notes"}
           </Button>
         </Card>
