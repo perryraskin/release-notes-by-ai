@@ -36,57 +36,66 @@ Generate beautiful, professional release notes for your projects using AI. This 
 ### Installation
 
 1. Clone the repository:
-   \`\`\`bash
+
+   ```bash
    git clone https://github.com/perryraskin/release-notes-by-ai.git
    cd release-notes-by-ai
-   \`\`\`
+   ```
 
 2. Install dependencies:
-   \`\`\`bash
+
+   ```bash
    npm install
+   # or
+   yarn install
+   ```
 
-# or
+3. Set up your OpenAI API key in one of two ways:
 
-yarn install
-\`\`\`
+   a. Using localStorage (current implementation):
 
-3. Create a \`.env\` file in the root directory and add your OpenAI API key:
-   \`\`\`env
+   ```javascript
+   // Open your browser's developer console and run:
+   localStorage.setItem("OPENAI_API_KEY", "your_api_key_here");
+   ```
+
+   b. Using environment variables:
+   Create a `.env` file in the root directory and add:
+
+   ```env
    VITE_OPENAI_API_KEY=your_api_key_here
-   \`\`\`
+   ```
 
 4. Start the development server:
-   \`\`\`bash
+   ```bash
    npm run dev
+   # or
+   yarn dev
+   ```
 
-# or
-
-yarn dev
-\`\`\`
-
-The application will be available at \`http://localhost:8080\`
+The application will be available at `http://localhost:8080`
 
 ## Building for Production 🏗️
 
 To create a production build:
 
-\`\`\`bash
+```bash
 npm run build
 
 # or
 
 yarn build
-\`\`\`
+```
 
 ## Contributing 🤝
 
 Contributions are welcome! Feel free to:
 
 1. Fork the repository
-2. Create a new branch (\`git checkout -b feature/amazing-feature\`)
+2. Create a new branch (`git checkout -b feature/amazing-feature`)
 3. Make your changes
-4. Commit your changes (\`git commit -m 'Add some amazing feature'\`)
-5. Push to the branch (\`git push origin feature/amazing-feature\`)
+4. Commit your changes (`git commit -m 'Add some amazing feature'`)
+5. Push to the branch (`git push origin feature/amazing-feature`)
 6. Open a Pull Request
 
 Please make sure to update tests as appropriate and adhere to the existing coding style.
