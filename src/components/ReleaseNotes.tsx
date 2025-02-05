@@ -2,6 +2,8 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Copy } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 interface ReleaseNotesProps {
   content: string;
@@ -26,10 +28,9 @@ export const ReleaseNotes = ({ content }: ReleaseNotesProps) => {
           <Copy className="h-4 w-4" />
         </Button>
       </div>
-      <div
-        className="prose prose-sm max-w-none"
-        dangerouslySetInnerHTML={{ __html: content }}
-      />
+      <div className="prose prose-sm max-w-none dark:prose-invert">
+        <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
+      </div>
     </Card>
   );
 };

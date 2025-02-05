@@ -1,69 +1,102 @@
-# Welcome to your Lovable project
+# Release Notes by AI 🤖
 
-## Project info
+Generate beautiful, professional release notes for your projects using AI. This tool helps developers and teams automatically create meaningful release notes from their code changes.
 
-**URL**: https://lovable.dev/projects/dfeb56de-cb72-449d-ba59-c2c26ec95d28
+## Features ✨
 
-## How can I edit this code?
+- 🎯 AI-powered release notes generation
+- 💻 Modern React + TypeScript implementation
+- 🎨 Beautiful UI with Tailwind CSS and Radix UI components
+- 📋 Easy copy-to-clipboard functionality
+- 🌓 Dark/Light mode support
+- 📱 Responsive design
+- 🔍 GitHub integration for repository analysis
 
-There are several ways of editing your application.
+## Tech Stack 🛠️
 
-**Use Lovable**
+- [React](https://react.dev/) - UI Framework
+- [TypeScript](https://www.typescriptlang.org/) - Type Safety
+- [Vite](https://vitejs.dev/) - Build Tool
+- [Tailwind CSS](https://tailwindcss.com/) - Styling
+- [Radix UI](https://www.radix-ui.com/) - UI Components
+- [React Query](https://tanstack.com/query/latest) - Data Fetching
+- [React Router](https://reactrouter.com/) - Routing
+- [React Hook Form](https://react-hook-form.com/) - Form Management
+- [Zod](https://zod.dev/) - Schema Validation
+- [OpenAI API](https://openai.com/) - AI Integration
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/dfeb56de-cb72-449d-ba59-c2c26ec95d28) and start prompting.
+## Getting Started 🚀
 
-Changes made via Lovable will be committed automatically to this repo.
+### Prerequisites
 
-**Use your preferred IDE**
+- Node.js (v18 or higher)
+- npm or yarn
+- OpenAI API key
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Installation
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+1. Clone the repository:
+   \`\`\`bash
+   git clone https://github.com/perryraskin/release-notes-by-ai.git
+   cd release-notes-by-ai
+   \`\`\`
 
-Follow these steps:
+2. Install dependencies:
+   \`\`\`bash
+   npm install
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+# or
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+yarn install
+\`\`\`
 
-# Step 3: Install the necessary dependencies.
-npm i
+3. Create a \`.env\` file in the root directory and add your OpenAI API key:
+   \`\`\`env
+   VITE_OPENAI_API_KEY=your_api_key_here
+   \`\`\`
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+4. Start the development server:
+   \`\`\`bash
+   npm run dev
 
-**Edit a file directly in GitHub**
+# or
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+yarn dev
+\`\`\`
 
-**Use GitHub Codespaces**
+The application will be available at \`http://localhost:8080\`
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## Building for Production 🏗️
 
-## What technologies are used for this project?
+To create a production build:
 
-This project is built with .
+\`\`\`bash
+npm run build
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+# or
 
-## How can I deploy this project?
+yarn build
+\`\`\`
 
-Simply open [Lovable](https://lovable.dev/projects/dfeb56de-cb72-449d-ba59-c2c26ec95d28) and click on Share -> Publish.
+## Contributing 🤝
 
-## I want to use a custom domain - is that possible?
+Contributions are welcome! Feel free to:
 
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+1. Fork the repository
+2. Create a new branch (\`git checkout -b feature/amazing-feature\`)
+3. Make your changes
+4. Commit your changes (\`git commit -m 'Add some amazing feature'\`)
+5. Push to the branch (\`git push origin feature/amazing-feature\`)
+6. Open a Pull Request
+
+Please make sure to update tests as appropriate and adhere to the existing coding style.
+
+## License 📄
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Support 💪
+
+If you find this project useful, please consider giving it a ⭐️ on GitHub!
+
+For issues, feature requests, or questions, please use the [GitHub Issues](https://github.com/yourusername/release-notes-by-ai/issues) page.
