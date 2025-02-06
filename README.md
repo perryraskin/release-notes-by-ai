@@ -58,12 +58,13 @@ Generate beautiful, professional release notes for your projects using AI. This 
 
 3. Set up your API keys in one of two ways:
 
-   a. Using localStorage (current implementation):
+   a. Using localStorage:
 
    ```javascript
    // Open your browser's developer console and run:
    localStorage.setItem("OPENAI_API_KEY", "your_openai_api_key_here");
    localStorage.setItem("ANTHROPIC_API_KEY", "your_anthropic_api_key_here");
+   localStorage.setItem("GITHUB_TOKEN", "your_github_token_here");
    ```
 
    b. Using environment variables:
@@ -72,9 +73,12 @@ Generate beautiful, professional release notes for your projects using AI. This 
    ```env
    VITE_OPENAI_API_KEY=your_openai_api_key_here
    VITE_ANTHROPIC_API_KEY=your_anthropic_api_key_here
+   VITE_GITHUB_TOKEN=your_github_token_here
    ```
 
    Note: You only need to set up the API key for the service you plan to use. The application supports both OpenAI and Anthropic models.
+
+   Note: You only need a GitHub token if you plan to generate release notes for private repositories.
 
 4. Start the development server:
    ```bash
