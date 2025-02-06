@@ -4,10 +4,11 @@ Generate beautiful, professional release notes for your projects using AI. This 
 
 <img width="985" alt="image" src="https://github.com/user-attachments/assets/03f86b49-458c-4698-8a49-376aa37dd73c" />
 
-
 ## Features ✨
 
 - 🎯 AI-powered release notes generation
+- 🤖 Multiple AI model support (OpenAI GPT and Anthropic Claude)
+- 🔄 Model switching capability
 - 💻 Modern React + TypeScript implementation
 - 🎨 Beautiful UI with Tailwind CSS and Radix UI components
 - 📋 Easy copy-to-clipboard functionality
@@ -27,6 +28,7 @@ Generate beautiful, professional release notes for your projects using AI. This 
 - [React Hook Form](https://react-hook-form.com/) - Form Management
 - [Zod](https://zod.dev/) - Schema Validation
 - [OpenAI API](https://openai.com/) - AI Integration
+- [Anthropic Claude API](https://anthropic.com/) - AI Integration
 
 ## Getting Started 🚀
 
@@ -34,7 +36,8 @@ Generate beautiful, professional release notes for your projects using AI. This 
 
 - Node.js (v18 or higher)
 - npm or yarn
-- OpenAI API key
+- OpenAI API key (optional)
+- Anthropic API key (optional)
 
 ### Installation
 
@@ -53,21 +56,25 @@ Generate beautiful, professional release notes for your projects using AI. This 
    yarn install
    ```
 
-3. Set up your OpenAI API key in one of two ways:
+3. Set up your API keys in one of two ways:
 
    a. Using localStorage (current implementation):
 
    ```javascript
    // Open your browser's developer console and run:
-   localStorage.setItem("OPENAI_API_KEY", "your_api_key_here");
+   localStorage.setItem("OPENAI_API_KEY", "your_openai_api_key_here");
+   localStorage.setItem("ANTHROPIC_API_KEY", "your_anthropic_api_key_here");
    ```
 
    b. Using environment variables:
    Create a `.env` file in the root directory and add:
 
    ```env
-   VITE_OPENAI_API_KEY=your_api_key_here
+   VITE_OPENAI_API_KEY=your_openai_api_key_here
+   VITE_ANTHROPIC_API_KEY=your_anthropic_api_key_here
    ```
+
+   Note: You only need to set up the API key for the service you plan to use. The application supports both OpenAI and Anthropic models.
 
 4. Start the development server:
    ```bash
