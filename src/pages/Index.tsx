@@ -2,14 +2,16 @@ import { useState } from "react";
 import { GithubUrlInput } from "@/components/GithubUrlInput";
 import { DateRangeSelector } from "@/components/DateRangeSelector";
 import { ReleaseNotes } from "@/components/ReleaseNotes";
+import { SourceSelector, SourceType } from "@/components/SourceSelector";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   parseGithubUrl,
   fetchCommits,
+  fetchCommitDiffs,
   checkRepoVisibility,
 } from "@/lib/github";
-import { generateReleaseNotes } from "@/lib/openai";
+import { generateReleaseNotes, TokenLimitError } from "@/lib/openai";
 import { useToast } from "@/components/ui/use-toast";
 import { Card } from "@/components/ui/card";
 
@@ -20,6 +22,7 @@ const Index = () => {
   const [loading, setLoading] = useState(false);
   const [releaseNotes, setReleaseNotes] = useState<string>();
   const [urlError, setUrlError] = useState<string>();
+  const [sourceType, setSourceType] = useState<SourceType>("commits");
   const [githubToken, setGithubToken] = useState(
     localStorage.getItem("GITHUB_TOKEN") || ""
   );
@@ -88,14 +91,41 @@ const Index = () => {
         return;
       }
 
-      const commits = await fetchCommits(
-        repoInfo.owner,
-        repoInfo.repo,
-        startDate,
-        endDate
-      );
-      const notes = await generateReleaseNotes(commits.map((c) => c.message));
-      setReleaseNotes(notes);
+      let commitData;
+      if (sourceType === "commits") {
+        const commits = await fetchCommits(
+          repoInfo.owner,
+          repoInfo.repo,
+          startDate,
+          endDate
+        );
+        commitData = commits.map((c) => ({ message: c.message }));
+      } else {
+        commitData = await fetchCommitDiffs(
+          repoInfo.owner,
+          repoInfo.repo,
+          startDate,
+          endDate
+        );
+      }
+
+      try {
+        const notes = await generateReleaseNotes({
+          type: sourceType,
+          data: commitData,
+        });
+        setReleaseNotes(notes);
+      } catch (error) {
+        if (error instanceof TokenLimitError) {
+          toast({
+            title: "Error",
+            description: error.message,
+            variant: "destructive",
+          });
+        } else {
+          throw error;
+        }
+      }
     } catch (error) {
       toast({
         title: "Error",
@@ -153,6 +183,8 @@ const Index = () => {
               onStartDateChange={setStartDate}
               onEndDateChange={setEndDate}
             />
+
+            <SourceSelector value={sourceType} onChange={setSourceType} />
           </div>
 
           <Button className="w-full" onClick={handleSubmit} disabled={loading}>

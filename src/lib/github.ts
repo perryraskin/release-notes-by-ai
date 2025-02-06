@@ -7,6 +7,7 @@ export interface Commit {
   message: string;
   date: string;
   author: string;
+  diff?: string;
 }
 
 export interface RepoInfo {
@@ -67,6 +68,7 @@ export const checkRepoVisibility = async (
 };
 
 interface GitHubCommit {
+  sha: string;
   commit: {
     message: string;
   };
@@ -103,4 +105,62 @@ export const fetchCommits = async (
   return commits.map((commit) => ({
     message: commit.commit.message,
   }));
+};
+
+export const fetchCommitDiffs = async (
+  owner: string,
+  repo: string,
+  startDate: Date,
+  endDate: Date
+): Promise<Array<{ message: string; diff: string }>> => {
+  const token = localStorage.getItem("GITHUB_TOKEN");
+  const headers: HeadersInit = {
+    Accept: "application/vnd.github.v3+json",
+  };
+
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
+  const since = startDate.toISOString();
+  const until = endDate.toISOString();
+
+  // First get the commits
+  const response = await fetch(
+    `https://api.github.com/repos/${owner}/${repo}/commits?since=${since}&until=${until}`,
+    { headers }
+  );
+
+  if (!response.ok) {
+    throw new Error(`GitHub API error: ${response.statusText}`);
+  }
+
+  const commits = (await response.json()) as GitHubCommit[];
+
+  // Then fetch the diff for each commit
+  const commitsWithDiffs = await Promise.all(
+    commits.map(async (commit) => {
+      const diffResponse = await fetch(
+        `https://api.github.com/repos/${owner}/${repo}/commits/${commit.sha}`,
+        {
+          headers: {
+            ...headers,
+            Accept: "application/vnd.github.v3.diff",
+          },
+        }
+      );
+
+      if (!diffResponse.ok) {
+        throw new Error(`GitHub API error: ${diffResponse.statusText}`);
+      }
+
+      const diff = await diffResponse.text();
+      return {
+        message: commit.commit.message,
+        diff,
+      };
+    })
+  );
+
+  return commitsWithDiffs;
 };
