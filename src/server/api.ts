@@ -23,12 +23,12 @@ ${data
   const prompt = `${basePrompt}\n\nFormat the response in markdown.`;
 
   if (model === "claude") {
-    if (!anthropicKey) {
+    const apiKey = getApiKey("ANTHROPIC_API_KEY", anthropicKey);
+    if (!apiKey) {
       throw new Error("Anthropic API key is required");
     }
-
     const client = new Anthropic({
-      apiKey: anthropicKey,
+      apiKey,
     });
 
     const message = await client.messages.create({
@@ -47,12 +47,12 @@ ${data
 
     return message.content[0].type === "text" ? message.content[0].text : "";
   } else {
-    if (!openaiKey) {
+    const apiKey = getApiKey("OPENAI_API_KEY", openaiKey);
+    if (!apiKey) {
       throw new Error("OpenAI API key is required");
     }
-
     const openai = new OpenAI({
-      apiKey: openaiKey,
+      apiKey,
     });
 
     const response = await openai.chat.completions.create({
@@ -67,4 +67,144 @@ ${data
 
     return response.choices[0].message.content;
   }
+};
+
+// Helper function to get API keys with fallback
+const getApiKey = (envKey: string, localKey?: string) => {
+  const prefixedKey = `VITE_${envKey}`;
+  const key = process.env[prefixedKey] || localKey;
+  return key;
+};
+
+export const checkRepoVisibilityServer = async (
+  owner: string,
+  repo: string,
+  githubToken?: string
+): Promise<{ isPrivate: boolean; error?: string }> => {
+  try {
+    const token = getApiKey("GITHUB_TOKEN", githubToken);
+    const authHeader = token ? { Authorization: `Bearer ${token}` } : {};
+    const headers: HeadersInit = {
+      Accept: "application/vnd.github.v3+json",
+      ...authHeader,
+    };
+
+    const response = await fetch(
+      `https://api.github.com/repos/${owner}/${repo}`,
+      { headers }
+    );
+
+    if (!response.ok) {
+      if (response.status === 404) {
+        return {
+          isPrivate: true,
+          error:
+            "Repository not found. It might be private and require authentication.",
+        };
+      }
+      throw new Error(`GitHub API error: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return { isPrivate: data.private };
+  } catch (error) {
+    return {
+      isPrivate: false,
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
+  }
+};
+
+interface GitHubCommit {
+  sha: string;
+  commit: {
+    message: string;
+  };
+}
+
+export const fetchCommitsServer = async (
+  owner: string,
+  repo: string,
+  startDate: Date,
+  endDate: Date,
+  githubToken?: string
+): Promise<Array<{ message: string }>> => {
+  const token = getApiKey("GITHUB_TOKEN", githubToken);
+  const authHeader = token ? { Authorization: `Bearer ${token}` } : {};
+  const headers: HeadersInit = {
+    Accept: "application/vnd.github.v3+json",
+    ...authHeader,
+  };
+
+  const since = startDate.toISOString();
+  const until = endDate.toISOString();
+
+  const response = await fetch(
+    `https://api.github.com/repos/${owner}/${repo}/commits?since=${since}&until=${until}`,
+    { headers }
+  );
+
+  if (!response.ok) {
+    throw new Error(`GitHub API error: ${response.statusText}`);
+  }
+
+  const commits = await response.json();
+  return commits.map((commit: GitHubCommit) => ({
+    message: commit.commit.message,
+  }));
+};
+
+export const fetchCommitDiffsServer = async (
+  owner: string,
+  repo: string,
+  startDate: Date,
+  endDate: Date,
+  githubToken?: string
+): Promise<Array<{ message: string; diff: string }>> => {
+  const token = getApiKey("GITHUB_TOKEN", githubToken);
+  const authHeader = token ? { Authorization: `Bearer ${token}` } : {};
+  const headers: HeadersInit = {
+    Accept: "application/vnd.github.v3+json",
+    ...authHeader,
+  };
+
+  const since = startDate.toISOString();
+  const until = endDate.toISOString();
+
+  const response = await fetch(
+    `https://api.github.com/repos/${owner}/${repo}/commits?since=${since}&until=${until}`,
+    { headers }
+  );
+
+  if (!response.ok) {
+    throw new Error(`GitHub API error: ${response.statusText}`);
+  }
+
+  const commits = await response.json();
+
+  const commitsWithDiffs = await Promise.all(
+    commits.map(async (commit: GitHubCommit) => {
+      const diffResponse = await fetch(
+        `https://api.github.com/repos/${owner}/${repo}/commits/${commit.sha}`,
+        {
+          headers: {
+            ...headers,
+            Accept: "application/vnd.github.v3.diff",
+          },
+        }
+      );
+
+      if (!diffResponse.ok) {
+        throw new Error(`GitHub API error: ${diffResponse.statusText}`);
+      }
+
+      const diff = await diffResponse.text();
+      return {
+        message: commit.commit.message,
+        diff,
+      };
+    })
+  );
+
+  return commitsWithDiffs;
 };

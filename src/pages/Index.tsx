@@ -57,22 +57,6 @@ const Index = () => {
       return;
     }
 
-    const apiKey =
-      modelType === "gpt-4o-mini"
-        ? localStorage.getItem("OPENAI_API_KEY")
-        : localStorage.getItem("ANTHROPIC_API_KEY");
-
-    if (!apiKey) {
-      toast({
-        title: "Error",
-        description: `Please enter your ${
-          modelType === "gpt-4o-mini" ? "OpenAI" : "Anthropic"
-        } API key in the settings`,
-        variant: "destructive",
-      });
-      return;
-    }
-
     setLoading(true);
     try {
       // Check repository visibility
@@ -85,16 +69,6 @@ const Index = () => {
         toast({
           title: "Error",
           description: error,
-          variant: "destructive",
-        });
-        return;
-      }
-
-      if (isPrivate && !githubToken) {
-        toast({
-          title: "Error",
-          description:
-            "This is a private repository. Please provide a GitHub access token.",
           variant: "destructive",
         });
         return;
@@ -164,27 +138,6 @@ const Index = () => {
 
         <Card className="p-6 space-y-6">
           <div className="space-y-4">
-            <div>
-              <label
-                htmlFor="github-token"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-              >
-                GitHub Access Token (required for private repositories)
-              </label>
-              <Input
-                id="github-token"
-                type="password"
-                value={githubToken}
-                onChange={(e) => handleGithubTokenChange(e.target.value)}
-                placeholder="ghp_xxxxxxxxxxxxxxxxxxxx"
-                className="mt-1"
-              />
-              <p className="mt-1 text-sm text-gray-500">
-                Your token will be stored locally and only used to access GitHub
-                repositories
-              </p>
-            </div>
-
             <GithubUrlInput value={url} onChange={setUrl} error={urlError} />
 
             <DateRangeSelector
