@@ -3,6 +3,7 @@ import { GithubUrlInput } from "@/components/GithubUrlInput";
 import { DateRangeSelector } from "@/components/DateRangeSelector";
 import { ReleaseNotes } from "@/components/ReleaseNotes";
 import { SourceSelector, SourceType } from "@/components/SourceSelector";
+import { ModelSelector, ModelType } from "@/components/ModelSelector";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -23,6 +24,7 @@ const Index = () => {
   const [releaseNotes, setReleaseNotes] = useState<string>();
   const [urlError, setUrlError] = useState<string>();
   const [sourceType, setSourceType] = useState<SourceType>("commits");
+  const [modelType, setModelType] = useState<ModelType>("gpt-4o-mini");
   const [githubToken, setGithubToken] = useState(
     localStorage.getItem("GITHUB_TOKEN") || ""
   );
@@ -55,10 +57,17 @@ const Index = () => {
       return;
     }
 
-    if (!localStorage.getItem("OPENAI_API_KEY")) {
+    const apiKey =
+      modelType === "gpt-4o-mini"
+        ? localStorage.getItem("OPENAI_API_KEY")
+        : localStorage.getItem("ANTHROPIC_API_KEY");
+
+    if (!apiKey) {
       toast({
         title: "Error",
-        description: "Please enter your OpenAI API key in the settings",
+        description: `Please enter your ${
+          modelType === "gpt-4o-mini" ? "OpenAI" : "Anthropic"
+        } API key in the settings`,
         variant: "destructive",
       });
       return;
@@ -112,6 +121,7 @@ const Index = () => {
       try {
         const notes = await generateReleaseNotes({
           type: sourceType,
+          model: modelType,
           data: commitData,
         });
         setReleaseNotes(notes);
@@ -185,6 +195,7 @@ const Index = () => {
             />
 
             <SourceSelector value={sourceType} onChange={setSourceType} />
+            <ModelSelector value={modelType} onChange={setModelType} />
           </div>
 
           <Button className="w-full" onClick={handleSubmit} disabled={loading}>
